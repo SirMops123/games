@@ -4,17 +4,14 @@ import type {Renderer} from "../core/renderer.ts";
 export abstract class Entity implements Vector2Like {
     x: number;
     y: number;
+    w: number;
+    h: number;  
 
-    protected constructor(vector2: Vector2Like) {
-        this.x = vector2.x;
-        this.y = vector2.y;
-    }
-
-    get positionVector(): Vector2Like {
-        return {
-            x: this.x,
-            y: this.y,
-        }
+    protected constructor(x: number, y: number, w: number, h: number) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
     }
 
     update(delta: number) {}
