@@ -159,4 +159,8 @@ export class LinuxWithWeix extends Game {
 
         this.screen = new GameScreen()
     }
+
+    reset() {
+        this.screen = new GameScreen()
+    }
 }
