@@ -2,14 +2,30 @@ import {Entity} from "../../engine/entity/entity.ts";
 import type {Renderer} from "../../engine/core/renderer.ts";
 import type {Input} from "../../engine/core/input.ts";
 import {config} from "../../engine/config.ts";
+import {Game} from "../../engine/core/game.ts";
 
 class Mauss extends Entity{
     private active = false;
-    constructor() {
+    private timer = 0;
+    constructor(x:number,y:number) {
         const size = 20
-        super(0,0,size,size)
+        super(x,y,size,size)
+    }
+    update(dt: number) {
+        if (this.active) {
+            this.timer -= dt
+            if(this.timer <= 0){
+                this.active = false;
+            }else {
+                if(Math.random() < 0.1){
+                    this.active = true;
+                    this.timer = 2;
+                }
+            }
+        }
     }
     render(r:Renderer){
+        if(!this.active)return
         r.drawRect(this.x,this.y,this.w,this.h,"#a00f05")
     }
     getHit(){
@@ -17,6 +33,9 @@ class Mauss extends Entity{
     }
     peek(){
         this.active = true;
+    }
+    isActive(){
+        return this.active;
     }
 }
 class Hammer extends Entity{
@@ -45,8 +64,12 @@ class GameScreen extends Screen{
     constructor() {
         super()
         this.entities.push(new Hammer());
+
+        const y = 200
+
         for (let i = 0; i < 10; i++) {
-            const m = new Mauss();
+            const x = 50 + i  * 60
+            const m = new Mauss(x,y);
             this.entities.push(m);
         }
     }
@@ -97,7 +120,7 @@ class GameScreen extends Screen{
         }
 
         for (const m of mausses) {
-            if(hitBox.collidesWith(m)){
+            if(m.isActive() && hitBox.collidesWith(m)){
                 m.getHit()
                 this.score += 100
             }
@@ -118,7 +141,16 @@ class GameScreen extends Screen{
         }
         hammer.x += hammer.speed * dt
     }
+}
+export class HitTheMauss extends Game{
+    constructor() {
+        super();
 
+        this.screen = new GameScreen();
+    }
 
+    reset(){
+        this.screen = new GameScreen();
+    }
 
 }
