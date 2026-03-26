@@ -38,7 +38,7 @@ export class Renderer {
     async loadImage(src: string): Promise<HTMLImageElement> {
         return new Promise((resolve, reject) => {
             if (this.cache.has(src)) {
-                resolve(this.cache.get(src)!);
+                return resolve(this.cache.get(src)!);
             }
 
             const img = new Image()
