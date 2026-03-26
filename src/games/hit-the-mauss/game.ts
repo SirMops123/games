@@ -8,6 +8,7 @@ import {Scene} from "../../engine/scenes/scene.ts";
 class Mauss extends Entity {
     private active = false;
     private timer = 0;
+    private spawnChance = 0.2
 
 
     constructor(x: number, y: number) {
@@ -16,21 +17,24 @@ class Mauss extends Entity {
     }
 
     spawn() {
-        if (Math.random() < 0.3) {
+        if (Math.random() < this.spawnChance) {
             this.active = true;
             this.timer = 2;
             console.log("Mauss Spawned")
+            console.log("Spawnchance: " + this.spawnChance);
         }
     }
 
-    update(dt: number) {
+    update(dt: number): boolean {
         if (this.active) {
             this.timer -= dt
             if (this.timer <= 0) {
                 this.active = false;
                 console.log("Mauss despawned")
+                return true;
             }
         }
+        return false;
     }
 
     render(r: Renderer) {
@@ -52,10 +56,14 @@ class Mauss extends Entity {
     isActive() {
         return this.active;
     }
+
+    setSpawnChance(value: number) {
+        this.spawnChance = value;
+    }
 }
 
 class Hammer extends Entity {
-    speed = 60
+    speed = 250
     private ready = true;
 
     constructor() {
@@ -77,11 +85,23 @@ class HitBox extends Entity {
 type GameState = "start" | "running" | "end"
 
 class GameScene extends Scene {
+    lives: number = 3;
+
     entities: Entity[] = [];
     score: number = 0
     gamestate: GameState = "running"
 
     timer: number = 0;
+
+    movementLocked: boolean = false;
+    lockTimer: number = 0;
+    hitcooldown: number = 0.5;
+
+    difficultyTimer: number = 0;
+
+    spawnInterval: number = 1;
+
+
 
     constructor() {
         super()
@@ -101,26 +121,61 @@ class GameScene extends Scene {
             e.render(r)
         }
         r.text(`Score: ${this.score}`, 10, 20, "#fff")
+        r.text(`Lives: ${this.lives}`, 150, 20, "#fff")
+
+        if(this.gamestate === "end"){
+            r.advancedText("Game Over", config.canvas_width/2,config.canvas_height/2, "#fff",{textAlign:"center",textBaseline:"middle"})
+        }
+
     }
 
     update(dt: number, input: Input) {
         this.timer += dt;
+        this.difficultyTimer += dt;
+        this.spawnInterval = Math.max(0.3, 1 - this.difficultyTimer * 0.02);
 
+        if(this.movementLocked) {
+            this.lockTimer -= dt;
+            if(this.lockTimer <= 0){
+                this.movementLocked = false;
+            }
+        }
         if (this.gamestate === "running") {
-            for (const e of this.entities) {
-                e.update(dt)
 
-                if (this.timer > 1 && e instanceof Mauss) {
-                    e.spawn()
+            for (const e of this.entities) {
+                if (e instanceof Mauss) {
+
+                    const result = e.update(dt)
+
+                    if (result) {
+                        this.lives--;
+                        console.log("Leben verloren")
+
+                        if (this.lives <= 0) {
+                            console.log("Game Over")
+                            this.gamestate = "end"
+                        }
+                    }
+                }else{
+                    e.update(dt)
                 }
             }
 
-            if (this.timer > 1) {
-                this.timer -= 1;
-            }
-        }
-        this.handleInput(input, dt)
+            if (this.timer > this.spawnInterval) {
+                const mausses = this.entities.filter(e => e instanceof Mauss) as Mauss[];
 
+                const randomMauss = mausses[Math.floor(Math.random() * mausses.length)];
+
+                const difficulty = Math.min(0.5, 0.2 + this.difficultyTimer * 0.01);
+
+                randomMauss.setSpawnChance(difficulty);
+                randomMauss.spawn();
+
+                this.timer -= this.spawnInterval;
+            }
+
+            this.handleInput(input, dt)
+        }
     }
 
     handleInput(input: Input, dt: number) {
@@ -129,20 +184,28 @@ class GameScene extends Scene {
                 this.hitMauss()
             }
         }
-        if (input.isDown("a")) {
-            if (this.gamestate === "running") {
-                this.moveLeft(dt)
+        if(!this.movementLocked) {
+
+
+            if (input.isDown("a")) {
+                if (this.gamestate === "running") {
+                    this.moveLeft(dt)
+                }
             }
-        }
-        if (input.isDown("d")) {
-            if (this.gamestate === "running") {
-                this.moveRight(dt)
+            if (input.isDown("d")) {
+                if (this.gamestate === "running") {
+                    this.moveRight(dt)
+                }
             }
         }
     }
 
     hitMauss() {
         const hammer = this.entities.find(e => e instanceof Hammer)!
+
+        this.movementLocked = true;
+        this.lockTimer = this.hitcooldown;
+
         const hitBox = new HitBox(hammer.x, hammer.y, hammer.w, config.canvas_height);
 
         const mausses: Mauss[] = []
@@ -171,7 +234,7 @@ class GameScene extends Scene {
 
     moveRight(dt: number) {
         const hammer = this.entities.find(e => e instanceof Hammer)!
-        if (hammer.x > config.canvas_width) {
+        if (hammer.x > config.canvas_width - hammer.w - 20) {
             return
         }
         hammer.x += hammer.speed * dt
