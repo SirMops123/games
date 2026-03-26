@@ -5,6 +5,7 @@ import {Scene} from "../../engine/scenes/scene.ts";
 import {config} from "../../engine/config.ts";
 import type {Input} from "../../engine/core/input.ts";
 import {MenuScene} from "../../engine/scenes/menuScene.ts";
+import {HeartDisplay} from "../../engine/entity/heartDisplay.ts";
 
 class Weix extends Entity {
     constructor() {
@@ -107,6 +108,8 @@ class GameScene extends Scene {
             const s = new Student(20 + gap * i)
             this.entities.push(s)
         }
+
+        this.entities.push(new HeartDisplay());
     }
 
     render(r: Renderer) {
