@@ -1,5 +1,4 @@
 import {Entity} from "./entity.ts";
-import {config} from "../config.ts";
 import type {Renderer} from "../core/renderer.ts";
 import type {Signal} from "../utils/signal.ts";
 
@@ -11,7 +10,7 @@ export class ScoreDisplay extends Entity {
     }
 
     render(r: Renderer) {
-        r.advancedText(`Score: ${this.score.get()}`, this.x, this.y, "#fff", {
+        r.advancedText(`Score: ${this.score()}`, this.x, this.y, "#fff", {
             textBaseline: "top",
             textAlign: "left",
         })

@@ -1,23 +1,23 @@
-export class Signal<T> {
-    private value: T;
+export function signal<T>(initial: T): Signal<T> {
+    let value = initial;
 
-    constructor(value: T) {
-        this.value = value;
+    function read() {
+        return value;
     }
 
-    get() {
-        return this.value;
+    read.set = (v: T) => {
+        value = v;
     }
 
-    set(value: T) {
-        this.value = value;
+    read.update = (c: (v: T) => T) => {
+        value = c(value);
     }
 
-    update(c: (value: T) => T) {
-        this.value = c(this.value)
-    }
+    return read;
 }
 
-export function signal<T>(value: T) {
-    return new Signal<T>(value);
-}
+export type Signal<T> = {
+    (): T;
+    set(value: T): void;
+    update(fn: (value: T) => T): void;
+};

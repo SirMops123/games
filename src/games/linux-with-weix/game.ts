@@ -121,7 +121,7 @@ class GameScene extends Scene {
             e.render(r)
         }
 
-        if (this.score.get() === 1000) {
+        if (this.score() === 1000) {
             if (currentTime % 2) {
                 r.text(`JACKPOT`, config.canvas_width - 65, 20, "#fff")
             }
@@ -152,7 +152,7 @@ class GameScene extends Scene {
         for (const e of this.entities) {
             if (e instanceof Student) {
                 if (e.collidesWith(scareArea)) {
-                    this.score.update(v => v += 100)
+                    this.score.update(v => v + 100)
                     e.scare();
                 }
             }
