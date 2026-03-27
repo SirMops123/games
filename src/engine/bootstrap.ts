@@ -23,7 +23,7 @@ export async function createGamePage(GameClass: new () => Game) {
     game.start()
 
     window.addEventListener("keydown", (e) => {
-        if (e.key === "R") {
+        if (e.key.toLowerCase() === "r") {
             game.reset();
         }
     })
