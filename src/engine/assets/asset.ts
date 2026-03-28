@@ -24,7 +24,7 @@ export class SoundAsset implements Asset {
     constructor(public src: string) {}
 
     async load(): Promise<void> {
-        this.audio = new Audio();
+        this.audio = new Audio(this.src);
 
         await new Promise<void>((res, rej) => {
             this.audio.oncanplaythrough = () => res();
