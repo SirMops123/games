@@ -8,6 +8,9 @@ import {MenuScene} from "../../engine/scenes/menuScene.ts";
 import {signal} from "../../engine/utils/signal.ts";
 import {ScoreDisplay} from "../../engine/entity/scoreDisplay.ts";
 import {HeartDisplay} from "../../engine/entity/heartDisplay.ts";
+import type {AssetLoader} from "../../engine/assets/assetloader.ts";
+import {type Asset, ImageAsset} from "../../engine/assets/asset.ts";
+import table from "../../../public/assets/images/table.png";
 
 type TableStatus = "home" | "moving" | "locked";
 
@@ -22,8 +25,8 @@ class Table extends Entity {
     render(r: Renderer) {
         const color = this.status === "locked" ? config.theme.colors.green : config.theme.colors.blue;
 
-        r.drawRect(this.x,this.y,this.w,this.h,color)
-        r.advancedText(this.id.toString(),this.x +  this.w / 2, this.y + this.h / 2, config.theme.colors.white,
+        r.drawImage(tableAsset.img, this.x, this.y, this.w, this.h);
+        r.advancedText(this.id.toString(),this.x +  this.w / 2, this.y + this.h / 2 - 2, config.theme.colors.white,
             {textAlign : "center", textBaseline : "middle"})
     }
 
@@ -233,6 +236,8 @@ class GameScene extends Scene {
     }
 }
 
+const tableAsset = new ImageAsset(table);
+
 export class TestTheTables extends Game {
     constructor() {
         super();
@@ -242,5 +247,11 @@ export class TestTheTables extends Game {
     }
     reset(){
         this.scene = new GameScene(this.input);
+    }
+
+    loadAssets(loader: AssetLoader) {
+        super.loadAssets(loader);
+
+        loader.add(tableAsset);
     }
 }
