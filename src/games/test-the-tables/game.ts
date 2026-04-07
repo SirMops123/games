@@ -48,8 +48,9 @@ class HomeSlot extends Entity {
         this.tableId = id
     }
     render(r: Renderer) {
+        const pad = 1
 
-        r.drawRect(this.x,this.y,this.w,this.h, "rgba(255,255,255,0.2)")
+        r.drawRect(this.x - pad,this.y - pad,this.w + pad * 2,this.h + pad * 2, "rgba(255,255,255,0.2)")
         r.advancedText(this.tableId.toString(),this.x +  this.w / 2,this.y + this.y / 2,config.theme.colors.black,{textAlign:"center",textBaseline:"middle"})
     }
 }
@@ -74,9 +75,11 @@ class Target extends Entity {
     }
     render(r: Renderer) {
         const color = this.isFilled? config.theme.colors.green : "rgba(255,255,255,0.2)";
-        r.drawRect(this.x,this.y,this.w,this.h,color)
+        const pad = this.isFilled? 2 : 0
 
-        r.advancedText(this.id.toString(),this.x, this.y, config.theme.colors.white,
+        r.drawRect(this.x - pad,this.y - pad,this.w + pad * 2,this.h + pad * 2,color)
+
+        if (!this.isFilled) r.advancedText(this.id.toString(),this.x, this.y, config.theme.colors.white,
             {textAlign : "center", textBaseline : "middle"})
     }
 }
