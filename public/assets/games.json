@@ -22,5 +22,11 @@
     "internal": "test-the-tables",
     "description": "Hurry up and arrange the Tables before the Test starts!",
     "author": "SirMops123"
+  },
+  {
+    "name": "Running with Häusler",
+    "internal": "running-with-haeusler",
+    "description": "You're on a run with Haeusler, try to keep up with his pace if you dont want to fall behind.",
+    "author": "SirMops123"
   }
 ]
