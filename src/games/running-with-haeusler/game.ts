@@ -11,11 +11,11 @@ import {MenuScene} from "../../engine/scenes/menuScene.ts";
 
 class Haeusler extends Entity{
     private nextPosY:number;
-    public speed: number = 200;
+    public speed: number = 100;
     public difficulty: number = 1.0
 
     constructor() {
-        super(config.canvas_width - 100, config.canvas_height / 2, 40, 80);
+        super(config.canvas_width - 100, config.canvas_height / 2, 40, 50);
         this.nextPosY = this.y
     }
 
@@ -32,13 +32,13 @@ class Haeusler extends Entity{
     render(r: Renderer) {
         r.drawRect(this.x,this.y,this.w,this.h,config.theme.colors.red);
 
-        r.drawRect(this.x - 200,this.y,200,this.h,"rgba(0,255,0,0.1)");
+        r.drawRect(this.x - 200,this.y,200,this.h,"rgba(0,255,0,0.4)");
     }
 }
 
 class Student extends Entity{
-    private verticalSpeed:number = 400;
-    private horizontalPushSpeed = 200;
+    private verticalSpeed:number = 250;
+    private horizontalPushSpeed = 300;
 
 
     constructor(x:number, y:number) {
@@ -46,12 +46,12 @@ class Student extends Entity{
     }
     updatePosition(dt:number, inSlipstream:boolean,targetX:number,difficulty:number) {
         if (inSlipstream){
-            const targetPos = targetX -50;
+            const targetPos = targetX -30;
             if (this.x < targetPos) {
                 this.x += this.horizontalPushSpeed * dt;
             }
         }else{
-            const driftPower = 150 * difficulty;
+            const driftPower = 250 * difficulty;
             this.x -= driftPower * dt;
         }
     }
@@ -86,7 +86,7 @@ class GameScene extends Scene{
 
         this.haeusler = new Haeusler();
 
-        this.student = new Student(config.canvas_width - 250, config.canvas_height / 2);
+        this.student = new Student(config.canvas_width - 150, config.canvas_height / 2);
     }
 
     private checkSlipstrem():boolean {
@@ -96,8 +96,11 @@ class GameScene extends Scene{
         const horizontalMatch = this.student.x + this.student.w > slipstreamXMin &&
         this.student.x <slipstreamXMax;
 
-        const verticalMatch = this.student.y > this.haeusler.y &&
-            this.student.y + this.student.h < this.haeusler.y + this.haeusler.h;
+        const tolerance = 15;
+
+        const verticalMatch =
+            this.student.y > this.haeusler.y - tolerance &&
+            this.student.y + this.student.h < this.haeusler.y + this.haeusler.h + tolerance;
 
         return horizontalMatch && verticalMatch;
     }
@@ -116,9 +119,11 @@ class GameScene extends Scene{
         this.student.updatePosition(dt,inSlipstream,this.haeusler.x,this.difficulty);
 
         this.timer += dt;
-        if (this.timer >= 1.0){}
-        this.score.update(v => v + 100)
-        this.timer = 0;
+        if (this.timer >= 1){
+            this.score.update(v => v + 100)
+            this.timer = 0;
+        }
+
     }
 
     render(r: Renderer) {
@@ -129,8 +134,9 @@ class GameScene extends Scene{
 
         this.scoreDisplay.render(r)
 
-        r.advancedText(`Tempo: ${this.difficulty.toFixed(1)}x`, 20, 50, config.theme.colors.white, {
-            textAlign: "left"
+        r.advancedText(`Tempo: ${this.difficulty.toFixed(1)}x`, 150, 7, config.theme.colors.white, {
+            textAlign: "left",
+            textBaseline: "top"
         });
 
        if (this.state === "end") {
@@ -146,9 +152,6 @@ class GameScene extends Scene{
     private drawTrack(r: Renderer) {
         r.drawRect(0, 0, 5, config.canvas_height, config.theme.colors.red);
 
-        for (let i = 0; i < 10; i++) {
-            r.drawRect(200 * i, config.canvas_height / 2 - 2, 50, 4, "rgba(255,255,255,0.1)");
-        }
     }
 }
 export class RunningWithHaeusler extends Game {
