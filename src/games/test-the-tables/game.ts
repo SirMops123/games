@@ -145,7 +145,9 @@ class GameScene extends Scene {
 			this.tables.push(new Table(i, slot));
 		}
 		input.onKeyDown((key) => {
-			if (this.state !== 'running') {return;}
+			if (this.state !== 'running') {
+				return;
+			}
 
 			const val = parseInt(key);
 			if (val >= 1 && val <= 5) {
@@ -175,14 +177,18 @@ class GameScene extends Scene {
 
 				attempts++;
 
-				if (attempts > 100) {break;}
+				if (attempts > 100) {
+					break;
+				}
 			} while (this.targets.some((t) => target.collidesWith(t)));
 
 			this.targets.push(target);
 		});
 	}
 	update(dt: number, input: Input) {
-		if (this.state === 'end') {return;}
+		if (this.state === 'end') {
+			return;
+		}
 
 		this.currentTime -= dt;
 		if (this.currentTime <= 0) {
