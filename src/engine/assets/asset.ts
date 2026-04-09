@@ -38,4 +38,21 @@ export class SoundAsset implements Asset {
         this.audio.currentTime = 0;
         this.audio.play();
     }
+
+    pause(): void {
+        this.audio.pause();
+    }
+
+    resume(): void {
+        this.audio.play();
+    }
+
+    stop(): void {
+        this.audio.pause();
+        this.audio.currentTime = 0;
+    }
+
+    isPlaying(): boolean {
+        return !this.audio.paused;
+    }
 }

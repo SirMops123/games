@@ -154,6 +154,7 @@ class GameScene extends Scene {
 
         this.currentTime -= dt;
         if (this.currentTime <= 0) {
+            tableDanceAsset.stop()
             this.state = "end"
             return;
         }
