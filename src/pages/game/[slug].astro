@@ -11,8 +11,10 @@ export function getStaticPaths() {
 
 const { slug } = Astro.params;
 const { title } = Astro.props;
+
+const game = games.find(v => v.slug === slug)!
 ---
-<GameLayout title={title}>
+<GameLayout game={game}>
     <canvas id="gamecanvas" data-slug={slug}></canvas>
     <script>
         const games = import.meta.glob('../../games/*/main.ts');
